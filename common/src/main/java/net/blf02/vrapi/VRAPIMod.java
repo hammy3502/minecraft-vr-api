@@ -42,12 +42,11 @@ public class VRAPIMod {
         if (Platform.getEnvironment() == Env.CLIENT) {
             ReflectionConstants.init();
             VRDataGrabber.init();
-        }
-
-        // Set USE_DEV_FEATURES based on if in dev environment and Vivecraft not detected.
-        if (!ReflectionConstants.clientHasVivecraft() && Platform.isDevelopmentEnvironment()) {
-            USE_DEV_FEATURES = true;
-            VRAPIModClient.initDebugKeys();
+            // Set USE_DEV_FEATURES based on if in dev environment and Vivecraft not detected.
+            if (!ReflectionConstants.clientHasVivecraft() && Platform.isDevelopmentEnvironment()) {
+                USE_DEV_FEATURES = true;
+                VRAPIModClient.initDebugKeys();
+            }
         }
 
         Network.CHANNEL.register(VRDataPacket.class, VRDataPacket::encode, VRDataPacket::decode,
