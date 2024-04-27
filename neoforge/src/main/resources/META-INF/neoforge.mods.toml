@@ -11,25 +11,26 @@ authors = "hammy3502"
 description = '''
 VR API mod that allows mods to integrate into Vivecraft.
 '''
+displayTest = "NONE"
 #logoFile = ""
 
 [[dependencies.vrapi]]
 modId = "neoforge"
-mandatory = true
-versionRange = "[20.4,)"
+type = "required"
+versionRange = "[20.5.20-beta,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.vrapi]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.4,)"
+type = "required"
+versionRange = "[1.20.5,1.20.6]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.vrapi]]
 modId = "architectury"
-mandatory = true
-versionRange = "[11.0.11,)"
+type = "required"
+versionRange = "[12.0.27,)"
 ordering = "AFTER"
 side = "BOTH"
