@@ -49,6 +49,8 @@ public class VRAPIMod {
             }
         }
 
+        Network.registerInternalPackets();
+
         Network.CHANNEL.register(VRDataPacket.class, VRDataPacket::encode, VRDataPacket::decode,
                 VRDataPacket::handle);
         Network.CHANNEL.register(VRRumblePacket.class, VRRumblePacket::encode, VRRumblePacket::decode,
