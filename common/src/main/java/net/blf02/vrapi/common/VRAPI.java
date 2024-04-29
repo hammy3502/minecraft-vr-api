@@ -5,6 +5,7 @@ import dev.architectury.utils.Env;
 import net.blf02.vrapi.VRAPIMod;
 import net.blf02.vrapi.api.IVRAPI;
 import net.blf02.vrapi.api.data.IVRPlayer;
+import net.blf02.vrapi.client.MessageClient;
 import net.blf02.vrapi.client.ReflectionConstants;
 import net.blf02.vrapi.client.ServerHasAPI;
 import net.blf02.vrapi.client.VRDataGrabber;
@@ -171,19 +172,21 @@ public class VRAPI implements IVRAPI {
      */
     public void triggerHapticPulse(int controllerNum, float durationSeconds, float frequency, float amplitude, float delaySeconds,
                                    @Nullable ServerPlayer player) {
-        if (Platform.getEnvironment() == Env.CLIENT) {
-            try {
-                VRDataGrabber.initMinecraftVRInstanceIfNeeded();
-                VRDataGrabber.MCVR_triggerHapticPulse.invoke(VRDataGrabber.Minecraft_vr_Instance,
-                        ReflectionConstants.ControllerType_ENUMS[controllerNum], durationSeconds, frequency, amplitude, delaySeconds);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                if (!(VRAPIMod.USE_DEV_FEATURES && DevModeData.devModeInVR)) {
+        if (player != null) {
+            Network.CHANNEL.sendToPlayer(player,
+                    new VRRumblePacket(controllerNum, durationSeconds, frequency, amplitude, delaySeconds));
+        } else if (Platform.getEnvironment() == Env.CLIENT) {
+            if (VRAPIMod.USE_DEV_FEATURES && DevModeData.devModeInVR) {
+                MessageClient.msg("Did haptic pulse for %.2f seconds on controller number %d.".formatted(durationSeconds, controllerNum));
+            } else {
+                try {
+                    VRDataGrabber.initMinecraftVRInstanceIfNeeded();
+                    VRDataGrabber.MCVR_triggerHapticPulse.invoke(VRDataGrabber.Minecraft_vr_Instance,
+                            ReflectionConstants.ControllerType_ENUMS[controllerNum], durationSeconds, frequency, amplitude, delaySeconds);
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException("Could not run triggerHapticPulse function. Not sure why, though...");
                 }
             }
-        } else if (player != null) {
-            Network.CHANNEL.sendToPlayer(player,
-                    new VRRumblePacket(controllerNum, durationSeconds, frequency, amplitude, delaySeconds));
         }
     }
 
