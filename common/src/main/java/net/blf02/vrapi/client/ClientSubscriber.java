@@ -25,12 +25,6 @@ public class ClientSubscriber {
 
     public static void onPlayerTick(Player player) {
         if (player.level.isClientSide && player == Minecraft.getInstance().player) {
-            if (!didJoinPacket) {
-                onLogin(player);
-                didJoinPacket = true;
-                sentVRDisabledPacket = false;
-            }
-
             VRPlayer vrPlayer = VRDataGrabber.getVRPlayer(VRDataGrabber.PlayerType.WORLD_POST);
 
             // Let dev set pos here and monitor keystrokes
@@ -110,23 +104,24 @@ public class ClientSubscriber {
                 sentVRDisabledPacket = true;
 
             }
-            if (ServerHasAPI.countForAPIResponse) {
+            if (ServerHasAPI.apiResponseCountdown > 0) {
+                if (ServerHasAPI.apiResponseCountdown == 200) {
+                    // Needed so we have backwards compat with older MC VR API versions
+                    // TODO: Remove on 3.1.z or 4.y.z
+                    Network.CHANNEL.sendToServer(new VersionSyncPacket(Network.PROTOCOL_VERSION));
+                }
                 if (--ServerHasAPI.apiResponseCountdown < 1) {
-                    ServerHasAPI.countForAPIResponse = false;
                     player.sendMessage(
-                            new TextComponent("Server does not have API mod; modded VR features may not work!"),
-                            player.getUUID());
+                            new TranslatableComponent("message.vrapi.no_api_server"), player.getUUID());
                 }
             }
         }
     }
 
-    private static void onLogin(Player player) {
+    public static void onLogout(Player player) {
         didJoinPacket = false;
         sentVRDisabledPacket = false;
         ServerHasAPI.serverHasAPI = false;
-        ServerHasAPI.countForAPIResponse = true;
-        ServerHasAPI.apiResponseCountdown = 100;
-        Network.CHANNEL.sendToServer(new VersionSyncPacket(Network.PROTOCOL_VERSION));
+        ServerHasAPI.apiResponseCountdown = 200;
     }
 }
