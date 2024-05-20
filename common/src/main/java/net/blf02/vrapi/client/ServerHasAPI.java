@@ -5,6 +5,5 @@ public class ServerHasAPI {
     public static boolean serverHasAPI = false;
 
     // Used internally
-    public static boolean countForAPIResponse = false;
-    public static int apiResponseCountdown = 100;
+    public static int apiResponseCountdown = 200;
 }

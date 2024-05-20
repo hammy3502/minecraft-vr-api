@@ -54,7 +54,7 @@ public class VRAPI implements IVRAPI {
             VRDataGrabber.isSelf(player);
             return ServerHasAPI.serverHasAPI;
         } else {
-            return Tracker.playersInVR.contains(player.getGameProfile().getName());
+            return Tracker.playerToVR.get(player.getGameProfile().getName()) != null;
         }
     }
 
