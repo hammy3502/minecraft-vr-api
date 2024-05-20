@@ -31,6 +31,6 @@ side = "BOTH"
 [[dependencies.vrapi]]
 modId = "architectury"
 type = "required"
-versionRange = "[12.0.27,)"
+versionRange = "[12.0.1,)"
 ordering = "AFTER"
 side = "BOTH"
