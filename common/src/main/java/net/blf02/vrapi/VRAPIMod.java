@@ -1,14 +1,10 @@
 package net.blf02.vrapi;
 
-import dev.architectury.event.events.client.ClientPlayerEvent;
-import dev.architectury.event.events.common.PlayerEvent;
-import dev.architectury.event.events.common.TickEvent;
-import dev.architectury.platform.Platform;
-import dev.architectury.utils.Env;
 import net.blf02.vrapi.client.ClientSubscriber;
 import net.blf02.vrapi.client.ReflectionConstants;
 import net.blf02.vrapi.client.VRDataGrabber;
 import net.blf02.vrapi.common.Constants;
+import net.blf02.vrapi.common.Plat;
 import net.blf02.vrapi.common.network.Network;
 import net.blf02.vrapi.common.network.packets.LeftVRPacket;
 import net.blf02.vrapi.common.network.packets.VRDataPacket;
@@ -29,26 +25,27 @@ public class VRAPIMod {
 
     public static void init() {
         // Client only
-        if (Platform.getEnvironment() == Env.CLIENT) {
-            TickEvent.PLAYER_POST.register(ClientSubscriber::onPlayerTick);
-            ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(ClientSubscriber::onLogout);
-        }
-
-        // Common
-        if (Constants.doDebugging) {
-            TickEvent.PLAYER_POST.register(DebugSubscriber::onPlayerTick);
+        if (Plat.INSTANCE.isClient()) {
+            Plat.INSTANCE.registerClientPostTick(ClientSubscriber::onPlayerTick);
+            Plat.INSTANCE.registerClientPlayerQuit(ClientSubscriber::onLogout);
+            if (Constants.doDebugging) {
+                Plat.INSTANCE.registerClientPostTick(DebugSubscriber::onPlayerTick);
+            }
         }
 
         // Server
-        PlayerEvent.PLAYER_JOIN.register(ServerSubscriber::onPlayerJoin);
-        PlayerEvent.PLAYER_QUIT.register(ServerSubscriber::onPlayerDisconnect);
+        Plat.INSTANCE.registerOnPlayerJoin(ServerSubscriber::onPlayerJoin);
+        Plat.INSTANCE.registerOnPlayerDisconnect(ServerSubscriber::onPlayerDisconnect);
+        if (Constants.doDebugging) {
+            Plat.INSTANCE.registerServerPostTick(DebugSubscriber::onPlayerTick);
+        }
 
         // Only bother to grab VR Data when on the client-side
-        if (Platform.getEnvironment() == Env.CLIENT) {
+        if (Plat.INSTANCE.isClient()) {
             ReflectionConstants.init();
             VRDataGrabber.init();
             // Set USE_DEV_FEATURES based on if in dev environment and Vivecraft not detected.
-            if (!ReflectionConstants.clientHasVivecraft() && Platform.isDevelopmentEnvironment()) {
+            if (!ReflectionConstants.clientHasVivecraft() && Plat.INSTANCE.isDevelopmentEnvironment()) {
                 USE_DEV_FEATURES = true;
                 VRAPIModClient.initDebugKeys();
             }
