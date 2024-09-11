@@ -1,12 +1,8 @@
 package net.blf02.vrapi.common.network.packets;
 
-import dev.architectury.networking.NetworkManager;
 import net.blf02.vrapi.common.VRAPI;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-
-import java.util.function.Supplier;
 
 public class VRRumblePacket {
 
@@ -35,13 +31,10 @@ public class VRRumblePacket {
                 buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
     }
 
-    public void handle(Supplier<NetworkManager.PacketContext> ctx) {
-        ctx.get().queue(() -> {
-            Player senderP = ctx.get().getPlayer();
-            if (!(senderP instanceof ServerPlayer)) {  // From server to client
-                VRAPI.VRAPIInstance.triggerHapticPulse(this.controllerNum, this.duration, this.frequency,
-                        this.amplitude, this.delay, null);
-            }
-        });
+    public static void handle(VRRumblePacket message, ServerPlayer player) {
+        if (player == null) {  // From server to client
+            VRAPI.VRAPIInstance.triggerHapticPulse(message.controllerNum, message.duration, message.frequency,
+                    message.amplitude, message.delay, null);
+        }
     }
 }
