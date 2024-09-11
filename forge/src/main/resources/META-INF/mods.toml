@@ -26,10 +26,3 @@ mandatory = true
 versionRange = "[1.19.3,)"
 ordering = "NONE"
 side = "BOTH"
-
-[[dependencies.vrapi]]
-modId = "architectury"
-mandatory = true
-versionRange = "[7.0.66,)"
-ordering = "AFTER"
-side = "BOTH"
