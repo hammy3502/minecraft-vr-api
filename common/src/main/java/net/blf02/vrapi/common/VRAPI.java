@@ -1,7 +1,5 @@
 package net.blf02.vrapi.common;
 
-import dev.architectury.platform.Platform;
-import dev.architectury.utils.Env;
 import net.blf02.vrapi.VRAPIMod;
 import net.blf02.vrapi.api.IVRAPI;
 import net.blf02.vrapi.api.data.IVRPlayer;
@@ -175,7 +173,7 @@ public class VRAPI implements IVRAPI {
         if (player != null) {
             Network.CHANNEL.sendToPlayer(player,
                     new VRRumblePacket(controllerNum, durationSeconds, frequency, amplitude, delaySeconds));
-        } else if (Platform.getEnvironment() == Env.CLIENT) {
+        } else if (Plat.INSTANCE.isClient()) {
             if (VRAPIMod.USE_DEV_FEATURES && DevModeData.devModeInVR) {
                 MessageClient.msg("Did haptic pulse for %.2f seconds on controller number %d.".formatted(durationSeconds, controllerNum));
             } else {
