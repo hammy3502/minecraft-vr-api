@@ -1,7 +1,7 @@
 package net.blf02.vrapi;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
+import net.blf02.vrapi.common.Plat;
 import net.minecraft.client.KeyMapping;
 
 public class VRAPIModClient {
@@ -33,10 +33,10 @@ public class VRAPIModClient {
     );
 
     public static void initDebugKeys() {
-        KeyMappingRegistry.register(POSITION_LEFT);
-        KeyMappingRegistry.register(POSITION_RIGHT);
-        KeyMappingRegistry.register(POSITION_HMD);
-        KeyMappingRegistry.register(TOGGLE_VR_DEV);
+        Plat.INSTANCE.registerKeyBinding(POSITION_LEFT);
+        Plat.INSTANCE.registerKeyBinding(POSITION_RIGHT);
+        Plat.INSTANCE.registerKeyBinding(POSITION_HMD);
+        Plat.INSTANCE.registerKeyBinding(TOGGLE_VR_DEV);
     }
 
 }
