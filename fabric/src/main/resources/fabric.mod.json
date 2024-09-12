@@ -23,7 +23,7 @@
     ]
   },
   "depends": {
-    "fabric": "*",
-    "minecraft": ">=1.20.4"
+    "fabric": ">=0.100.2",
+    "minecraft": ">=1.20.6"
   }
 }

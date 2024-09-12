@@ -1,41 +1,30 @@
 package net.blf02.neoforge;
 
 import net.blf02.vrapi.VRAPIMod;
-import net.blf02.vrapi.common.network.Network;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 
-public class BufferPacket implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(VRAPIMod.MOD_ID, "network");
+public record BufferPacket(RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
-    private final FriendlyByteBuf buffer;
+    public static final Type<BufferPacket> ID = new Type<>(new ResourceLocation(VRAPIMod.MOD_ID, "network"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, BufferPacket> CODEC =
+            CustomPacketPayload.codec(BufferPacket::write, BufferPacket::read);
 
-    public BufferPacket(FriendlyByteBuf buffer) {
-        this.buffer = buffer;
+    public static BufferPacket read(RegistryFriendlyByteBuf buffer) {
+        return new BufferPacket(new RegistryFriendlyByteBuf(buffer.readBytes(buffer.readInt()), buffer.registryAccess(), ConnectionType.NEOFORGE));
     }
 
-    public static BufferPacket read(FriendlyByteBuf buffer) {
-        int numBytes = buffer.readInt();
-        return new BufferPacket(new FriendlyByteBuf(buffer.readBytes(numBytes)));
-    }
-
-    public void handle(PlayPayloadContext ctx) {
-        ServerPlayer player = ctx.player().orElse(null) instanceof ServerPlayer sp ? sp : null;
-        ctx.workHandler().execute(() -> Network.CHANNEL.doReceive(player, this.buffer));
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buffer) {
+    public void write(RegistryFriendlyByteBuf buffer) {
         buffer.writeInt(this.buffer.readableBytes());
         buffer.writeBytes(this.buffer);
         this.buffer.resetReaderIndex();
     }
 
     @Override
-    public ResourceLocation id() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

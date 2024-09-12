@@ -22,11 +22,6 @@ public class VRAPIForge {
         if (Plat.INSTANCE.isClient()) {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerKeyMappings);
         }
-        PlatformImpl.NETWORK.messageBuilder(BufferPacket.class)
-                .encoder(BufferPacket::encode)
-                .decoder(BufferPacket::decode)
-                .consumerNetworkThread(BufferPacket::handle)
-                .add();
 
         VRAPIMod.init();
     }

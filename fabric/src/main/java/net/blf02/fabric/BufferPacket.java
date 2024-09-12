@@ -1,4 +1,4 @@
-package net.blf02.forge;
+package net.blf02.fabric;
 
 import net.blf02.vrapi.VRAPIMod;
 import net.minecraft.network.RegistryFriendlyByteBuf;

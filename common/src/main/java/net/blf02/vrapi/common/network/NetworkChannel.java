@@ -2,7 +2,7 @@ package net.blf02.vrapi.common.network;
 
 import net.blf02.vrapi.VRAPIMod;
 import net.blf02.vrapi.common.Plat;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,8 +16,8 @@ public class NetworkChannel {
 
     private final List<NetworkRegistrationData<?>> packets = new ArrayList<>();
 
-    public <T> void register(Class<T> clazz, BiConsumer<T, FriendlyByteBuf> encoder,
-                             Function<FriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {
+    public <T> void register(Class<T> clazz, BiConsumer<T, RegistryFriendlyByteBuf> encoder,
+                             Function<RegistryFriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {
         packets.add(new NetworkRegistrationData<>(packets.size(), clazz, encoder, decoder, handler));
     }
 
@@ -32,7 +32,7 @@ public class NetworkChannel {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void doReceive(@Nullable ServerPlayer player, FriendlyByteBuf buffer) {
+    public <T> void doReceive(@Nullable ServerPlayer player, RegistryFriendlyByteBuf buffer) {
         NetworkRegistrationData<T> data = (NetworkRegistrationData<T>) packets.get(buffer.readInt());
         T message;
         try {
@@ -55,6 +55,6 @@ public class NetworkChannel {
         return data;
     }
 
-    public record NetworkRegistrationData<T>(int id, Class<T> clazz, BiConsumer<T, FriendlyByteBuf> encoder,
-                                              Function<FriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {}
+    public record NetworkRegistrationData<T>(int id, Class<T> clazz, BiConsumer<T, RegistryFriendlyByteBuf> encoder,
+                                              Function<RegistryFriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {}
 }

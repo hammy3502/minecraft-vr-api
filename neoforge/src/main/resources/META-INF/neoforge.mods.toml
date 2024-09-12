@@ -11,6 +11,7 @@ authors = "hammy3502"
 description = '''
 VR API mod that allows mods to integrate into Vivecraft.
 '''
+displayTest = "NONE"
 #logoFile = ""
 
 [[dependencies.vrapi]]
