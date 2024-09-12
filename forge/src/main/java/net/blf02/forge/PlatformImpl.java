@@ -27,10 +27,13 @@ import java.util.function.Consumer;
 public class PlatformImpl implements Platform {
 
     public static final List<Object> keyMappingsToRegister = new ArrayList<>();
-    public static final SimpleChannel NETWORK = ChannelBuilder.named(new ResourceLocation(VRAPIMod.MOD_ID, "network"))
+    public static final SimpleChannel NETWORK = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(VRAPIMod.MOD_ID, "network"))
+            .optional()
             .simpleChannel()
-            .play().bidirectional().add(BufferPacket.class, BufferPacket.CODEC, (bufferPacket, context) ->
-                    context.enqueueWork(() -> Network.CHANNEL.doReceive(context.getSender(), bufferPacket.buffer())))
+            .play().bidirectional().add(BufferPacket.class, BufferPacket.CODEC, (bufferPacket, context) -> {
+                context.enqueueWork(() -> Network.CHANNEL.doReceive(context.getSender(), bufferPacket.buffer()));
+                context.setPacketHandled(true);
+            })
             .build();
 
     @Override

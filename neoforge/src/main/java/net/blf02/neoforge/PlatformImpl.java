@@ -42,18 +42,23 @@ public class PlatformImpl implements Platform {
 
     @Override
     public <T> void sendToServer(T message, NetworkChannel.NetworkRegistrationData<T> data) {
-        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), ClientRegistryAccess.get(), ConnectionType.NEOFORGE);
-        buffer.writeInt(data.id());
-        data.encoder().accept(message, buffer);
-        PacketDistributor.sendToServer(new BufferPacket(buffer));
+        try {
+            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), ClientRegistryAccess.get(), ConnectionType.NEOFORGE);
+            buffer.writeInt(data.id());
+            data.encoder().accept(message, buffer);
+            PacketDistributor.sendToServer(new BufferPacket(buffer));
+        } catch (UnsupportedOperationException ignored) {} // Ignore errors from sending packets when the other side can't receive
     }
 
     @Override
     public <T> void sendToPlayer(ServerPlayer player, T message, NetworkChannel.NetworkRegistrationData<T> data) {
-        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess(), ConnectionType.NEOFORGE);
-        buffer.writeInt(data.id());
-        data.encoder().accept(message, buffer);
-        PacketDistributor.sendToPlayer(player, new BufferPacket(buffer));
+        try {
+            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess(), ConnectionType.NEOFORGE);
+            buffer.writeInt(data.id());
+            data.encoder().accept(message, buffer);
+            PacketDistributor.sendToPlayer(player, new BufferPacket(buffer));
+        } catch (UnsupportedOperationException ignored) {} // Ignore errors from sending packets when the other side can't receive
+
     }
 
     @Override

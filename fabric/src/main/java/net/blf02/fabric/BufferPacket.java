@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public record BufferPacket(RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
-    public static final Type<BufferPacket> ID = new Type<>(new ResourceLocation(VRAPIMod.MOD_ID, "network"));
+    public static final Type<BufferPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(VRAPIMod.MOD_ID, "network"));
     public static final StreamCodec<RegistryFriendlyByteBuf, BufferPacket> CODEC =
             CustomPacketPayload.codec(BufferPacket::write, BufferPacket::read);
 

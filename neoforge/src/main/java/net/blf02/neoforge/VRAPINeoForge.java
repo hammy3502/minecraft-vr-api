@@ -24,7 +24,7 @@ public class VRAPINeoForge {
         }
         modBus.addListener((RegisterPayloadHandlersEvent event) -> {
             PayloadRegistrar registrar = event.registrar(VRAPIMod.MOD_ID);
-            registrar.playBidirectional(BufferPacket.ID, BufferPacket.CODEC,
+            registrar.optional().playBidirectional(BufferPacket.ID, BufferPacket.CODEC,
                     new DirectionalPayloadHandler<>(
                             (packet, ctx) -> ctx.enqueueWork(() -> Network.CHANNEL.doReceive(null, packet.buffer())),
                             (packet, ctx) -> ctx.enqueueWork(() -> Network.CHANNEL.doReceive((ServerPlayer) ctx.player(), packet.buffer()))

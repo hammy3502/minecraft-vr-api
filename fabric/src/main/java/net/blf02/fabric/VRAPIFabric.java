@@ -14,11 +14,27 @@ public class VRAPIFabric implements ModInitializer {
         Plat.INSTANCE = new PlatformImpl();
         PayloadTypeRegistry.playS2C().register(BufferPacket.ID, BufferPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(BufferPacket.ID, BufferPacket.CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(BufferPacket.ID, ((payload, context) ->
-                context.server().execute(() -> Network.CHANNEL.doReceive(context.player(), payload.buffer()))));
+        ServerPlayNetworking.registerGlobalReceiver(BufferPacket.ID, ((payload, context) -> {
+            payload.buffer().retain();
+            context.server().execute(() -> {
+                try {
+                    Network.CHANNEL.doReceive(context.player(), payload.buffer());
+                } finally {
+                    payload.buffer().release();
+                }
+            });
+        }));
         if (Plat.INSTANCE.isClient()) {
-            ClientPlayNetworking.registerGlobalReceiver(BufferPacket.ID, (payload, context) ->
-                    context.client().execute(() -> Network.CHANNEL.doReceive(null, payload.buffer())));
+            ClientPlayNetworking.registerGlobalReceiver(BufferPacket.ID, (payload, context) -> {
+                payload.buffer().retain();
+                context.client().execute(() -> {
+                    try {
+                        Network.CHANNEL.doReceive(null, payload.buffer());
+                    } finally {
+                        payload.buffer().release();
+                    }
+                });
+            });
         }
         VRAPIMod.init();
     }
