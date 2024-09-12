@@ -1,6 +1,7 @@
 package net.blf02.fabric;
 
-import net.blf02.vrapi.VRAPIMod;
+import io.netty.buffer.Unpooled;
+import net.blf02.vrapi.client.ClientRegistryAccess;
 import net.blf02.vrapi.common.Platform;
 import net.blf02.vrapi.common.network.NetworkChannel;
 import net.fabricmc.api.EnvType;
@@ -9,22 +10,17 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
 
 public class PlatformImpl implements Platform {
-
-    public static final ResourceLocation S2C = new ResourceLocation(VRAPIMod.MOD_ID, "s2c");
-    public static final ResourceLocation C2S = new ResourceLocation(VRAPIMod.MOD_ID, "c2s");
 
     @Override
     public boolean isClient() {
@@ -45,18 +41,18 @@ public class PlatformImpl implements Platform {
 
     @Override
     public <T> void sendToServer(T message, NetworkChannel.NetworkRegistrationData<T> data) {
-        FriendlyByteBuf buffer = PacketByteBufs.create();
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), ClientRegistryAccess.get());
         buffer.writeInt(data.id());
         data.encoder().accept(message, buffer);
-        ClientPlayNetworking.send(C2S, buffer);
+        ClientPlayNetworking.send(new BufferPacket(buffer));
     }
 
     @Override
     public <T> void sendToPlayer(ServerPlayer player, T message, NetworkChannel.NetworkRegistrationData<T> data) {
-        FriendlyByteBuf buffer = PacketByteBufs.create();
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess());
         buffer.writeInt(data.id());
         data.encoder().accept(message, buffer);
-        ServerPlayNetworking.send(player, S2C, buffer);
+        ServerPlayNetworking.send(player, new BufferPacket(buffer));
     }
 
     @Override
