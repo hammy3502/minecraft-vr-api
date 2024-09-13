@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -82,10 +83,8 @@ public class PlatformImpl implements Platform {
 
     @Override
     public void registerClientPlayerQuit(Consumer<Player> quitHandler) {
-        MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent event) -> {
-            if (event.getEntity() == Minecraft.getInstance().player) {
-                quitHandler.accept((Player) event.getEntity());
-            }
+        MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggedOutEvent event) -> {
+            quitHandler.accept(event.getPlayer());
         });
     }
 
