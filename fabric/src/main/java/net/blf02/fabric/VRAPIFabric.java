@@ -12,21 +12,25 @@ public class VRAPIFabric implements ModInitializer {
     public void onInitialize() {
         Plat.INSTANCE = new PlatformImpl();
         ServerPlayNetworking.registerGlobalReceiver(PlatformImpl.C2S, (server, player, handler, buf, responseSender) -> {
-            try {
-                buf.retain();
-                server.execute(() -> Network.CHANNEL.doReceive(player, buf));
-            } finally {
-                buf.release();
-            }
-        });
-        if (Plat.INSTANCE.isClient()) {
-            ClientPlayNetworking.registerGlobalReceiver(PlatformImpl.S2C, (client, handler, buf, responseSender) -> {
+            buf.retain();
+            server.execute(() -> {
                 try {
-                    buf.retain();
-                    client.execute(() -> Network.CHANNEL.doReceive(null, buf));
+                    Network.CHANNEL.doReceive(player, buf);
                 } finally {
                     buf.release();
                 }
+            });
+        });
+        if (Plat.INSTANCE.isClient()) {
+            ClientPlayNetworking.registerGlobalReceiver(PlatformImpl.S2C, (client, handler, buf, responseSender) -> {
+                buf.retain();
+                client.execute(() -> {
+                    try {
+                        Network.CHANNEL.doReceive(null, buf);
+                    } finally {
+                        buf.release();
+                    }
+                });
             });
         }
         VRAPIMod.init();
