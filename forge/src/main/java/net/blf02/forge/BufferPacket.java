@@ -26,6 +26,7 @@ public class BufferPacket {
         ctx.enqueueWork(() -> {
             Network.CHANNEL.doReceive(ctx.getSender(), message.buffer);
         });
+        ctx.setPacketHandled(true);
     }
 
 }
