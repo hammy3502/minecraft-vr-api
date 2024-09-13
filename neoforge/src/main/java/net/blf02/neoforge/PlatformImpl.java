@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -79,10 +80,8 @@ public class PlatformImpl implements Platform {
 
     @Override
     public void registerClientPlayerQuit(Consumer<Player> quitHandler) {
-        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedOutEvent event) -> {
-            if (event.getEntity() == Minecraft.getInstance().player) {
-                quitHandler.accept(event.getEntity());
-            }
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> {
+            quitHandler.accept(event.getPlayer());
         });
     }
 
