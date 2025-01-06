@@ -31,6 +31,8 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+
+    include(implementation("org.joml:joml:1.10.5"))
 }
 
 processResources {
