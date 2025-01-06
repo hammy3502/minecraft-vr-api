@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -78,7 +79,10 @@ public class VRDataGrabber {
                 VRDevicePose_getRoll = getMethod(ReflectionConstants.VRDevicePoseRaw, "getRoll");
                 VRDevicePose_getMatrix = getMethod(ReflectionConstants.VRDevicePoseRaw, "getMatrix");
 
-                Matrix4f_toFloatBuffer = getMethod(ReflectionConstants.Matrix4f, "toFloatBuffer");
+                if (!ReflectionConstants.useJOMLClasses()) {
+                    Matrix4f_toFloatBuffer = getMethod(ReflectionConstants.Matrix4f, "toFloatBuffer");
+
+                }
 
                 try {
                     Minecraft_vr = getField(Minecraft.class, "vr");
@@ -151,27 +155,27 @@ public class VRDataGrabber {
             Object eye1DevicePoseRaw = VRData_eye1.get(vrDataRaw);
 
             Vec3 hmdPosition = (Vec3) VRDevicePose_getPosition.invoke(hmdDevicePoseRaw); // Gets the position for the HMD in the world.
-            Vec3 hmdLookVec = (Vec3) VRDevicePose_getDirection.invoke(hmdDevicePoseRaw);
+            Vec3 hmdLookVec = fromVivecraftVec3(VRDevicePose_getDirection.invoke(hmdDevicePoseRaw));
             float hmdRoll = (float) VRDevicePose_getRoll.invoke(hmdDevicePoseRaw);
             Matrix4f hmdRotMatr = fromVivecraftMatrix4f(VRDevicePose_getMatrix.invoke(hmdDevicePoseRaw));
 
             Vec3 c0Position = (Vec3) VRDevicePose_getPosition.invoke(c0DevicePoseRaw);
-            Vec3 c0LookVec = (Vec3) VRDevicePose_getDirection.invoke(c0DevicePoseRaw);
+            Vec3 c0LookVec = fromVivecraftVec3(VRDevicePose_getDirection.invoke(c0DevicePoseRaw));
             float c0roll = (float) VRDevicePose_getRoll.invoke(c0DevicePoseRaw);
             Matrix4f c0RotMatr = fromVivecraftMatrix4f(VRDevicePose_getMatrix.invoke(c0DevicePoseRaw));
 
             Vec3 c1Position = (Vec3) VRDevicePose_getPosition.invoke(c1DevicePoseRaw);
-            Vec3 c1LookVec = (Vec3) VRDevicePose_getDirection.invoke(c1DevicePoseRaw);
+            Vec3 c1LookVec = fromVivecraftVec3(VRDevicePose_getDirection.invoke(c1DevicePoseRaw));
             float c1roll = (float) VRDevicePose_getRoll.invoke(c1DevicePoseRaw);
             Matrix4f c1RotMatr = fromVivecraftMatrix4f(VRDevicePose_getMatrix.invoke(c1DevicePoseRaw));
 
             Vec3 eye0Position = (Vec3) VRDevicePose_getPosition.invoke(eye0DevicePoseRaw);
-            Vec3 eye0LookVec = (Vec3) VRDevicePose_getDirection.invoke(eye0DevicePoseRaw);
+            Vec3 eye0LookVec = fromVivecraftVec3(VRDevicePose_getDirection.invoke(eye0DevicePoseRaw));
             float eye0roll = (float) VRDevicePose_getRoll.invoke(eye0DevicePoseRaw);
             Matrix4f eye0RotMatr = fromVivecraftMatrix4f(VRDevicePose_getMatrix.invoke(eye0DevicePoseRaw));
 
             Vec3 eye1Position = (Vec3) VRDevicePose_getPosition.invoke(eye1DevicePoseRaw);
-            Vec3 eye1LookVec = (Vec3) VRDevicePose_getDirection.invoke(eye1DevicePoseRaw);
+            Vec3 eye1LookVec = fromVivecraftVec3(VRDevicePose_getDirection.invoke(eye1DevicePoseRaw));
             float eye1roll = (float) VRDevicePose_getRoll.invoke(eye1DevicePoseRaw);
             Matrix4f eye1RotMatr = fromVivecraftMatrix4f(VRDevicePose_getMatrix.invoke(eye1DevicePoseRaw));
 
@@ -188,7 +192,18 @@ public class VRDataGrabber {
         }
     }
 
+    private static Vec3 fromVivecraftVec3(Object vecIn) {
+        if (!ReflectionConstants.useJOMLClasses()) {
+            return (Vec3) vecIn;
+        }
+        Vector3f vec = (Vector3f) vecIn;
+        return new Vec3(vec.x, vec.y, vec.z);
+    }
+
     public static Matrix4f fromVivecraftMatrix4f(Object matrixIn) throws InvocationTargetException, IllegalAccessException {
+        if (ReflectionConstants.useJOMLClasses()) {
+            return (Matrix4f) matrixIn;
+        }
         FloatBuffer buffer = (FloatBuffer) Matrix4f_toFloatBuffer.invoke(matrixIn);
         Matrix4f matr = new Matrix4f(
                 buffer.get(), buffer.get(), buffer.get(), buffer.get(),
