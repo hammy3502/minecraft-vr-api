@@ -24,6 +24,8 @@ public class ReflectionConstants {
     public static Object[] ControllerType_ENUMS = null;
     // Whether Vivecraft is successfully loaded by the library.
     private static boolean hasVivecraft = false;
+    // Whether we're using Vivecraft 1.2.0 or later which uses JOML matrices
+    private static boolean useJOMLClasses = false;
 
     public static void init() {
         try {
@@ -45,8 +47,12 @@ public class ReflectionConstants {
                 MCVR = Class.forName(VIVECRAFT_CLIENT_VR_PACKAGE + ".provider.MCVR");
                 ControllerType = Class.forName(VIVECRAFT_CLIENT_VR_PACKAGE + ".provider.ControllerType");
                 ControllerType_ENUMS = ControllerType.getEnumConstants();
-                Matrix4f = Class.forName(VIVECRAFT_PACKAGE + ".common.utils.math.Matrix4f");
                 VRSettings = Class.forName(VIVECRAFT_CLIENT_VR_PACKAGE + ".settings.VRSettings");
+                try {
+                    Matrix4f = Class.forName(VIVECRAFT_PACKAGE + ".common.utils.math.Matrix4f");
+                } catch (ClassNotFoundException ignored2) {
+                    useJOMLClasses = true;
+                }
                 hasVivecraft = true;
             } catch (ClassNotFoundException ignored2) {}
         }
@@ -54,5 +60,9 @@ public class ReflectionConstants {
 
     public static boolean clientHasVivecraft() {
         return hasVivecraft;
+    }
+
+    public static boolean useJOMLClasses() {
+        return useJOMLClasses;
     }
 }
